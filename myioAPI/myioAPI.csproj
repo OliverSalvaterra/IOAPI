@@ -4,5 +4,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="mIODTOs">
+      <HintPath>..\..\DTO\mIODTOs\bin\Debug\netcoreapp3.1\mIODTOs.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 
 </Project>

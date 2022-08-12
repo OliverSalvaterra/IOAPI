@@ -5,11 +5,18 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Text;
 using mIODTOs;
+using System.Data.SqlClient;
 
 namespace myioAPI
 {
-    public class DataLayer : IDataLayer
+    public class DataLayer : IDataLayer, IDisposable
     {
+        private bool disposedValue;
+
+        public DataLayer()
+        {
+            SqlConnection sqlConnection = new SqlConnection();
+        }
 
         public string hash(string s)
         {
@@ -20,7 +27,7 @@ namespace myioAPI
 
         public int CreateUser(string username, string password)
         {
-            string databasPass = hash(password);
+            string databasePass = hash(password);
 
             return 1;
         }
@@ -85,6 +92,35 @@ namespace myioAPI
         public int SetDeviceTypeActivity(byte DeviceTypeID, bool IsActive)
         {
             return 1;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~DataLayer()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

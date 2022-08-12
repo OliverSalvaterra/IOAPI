@@ -5,8 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="mIODTOs">
-      <HintPath>..\..\DTO\mIODTOs\bin\Debug\netcoreapp3.1\mIODTOs.dll</HintPath>
+      <HintPath>..\DTO\mIODTOs\bin\Debug\netcoreapp3.1\mIODTOs.dll</HintPath>
     </Reference>
   </ItemGroup>
 

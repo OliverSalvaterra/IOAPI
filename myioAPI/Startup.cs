@@ -8,6 +8,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using static myioAPI.YesThisIsReallyADataBase;
@@ -19,14 +21,28 @@ namespace myioAPI
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            connectionString = new SqlConnectionStringBuilder()
+            {
+                DataSource = "GMRMLTV",
+                UserID = "sa",
+                Password = "GreatMinds110",
+                InitialCatalog = "OliverIODB"
+            }.ToString();
+
         }
 
         public IConfiguration Configuration { get; }
+        private static string connectionString;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
+            services.AddSwaggerGen();
+
+            services.AddScoped<IDbConnection, SqlConnection>((sp) => new SqlConnection(connectionString));
+            services.AddScoped<IDataLayer, DataLayer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,11 +53,18 @@ namespace myioAPI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+                options.RoutePrefix = string.Empty;
+            });
+
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -49,7 +72,7 @@ namespace myioAPI
             });
 
 
-            ConfigureDB();
+            //ConfigureDB();
         }
 
         private void ConfigureDB()

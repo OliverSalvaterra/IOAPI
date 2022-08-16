@@ -6,11 +6,11 @@ namespace myioAPI
     public interface IDataLayer
     {
         int CreateUser(string username, string password);
-        UserData[]? GetData(int UserID, int DeviceID, int MinValue, int MaxValue, DateTime MinDate, DateTime MaxDate);
-        Device[]? GetDevices(int UserID, bool IsActive);
+        UserData[] GetData(int UserID, int DeviceID, int MinValue, int MaxValue, DateTime MinDate, DateTime MaxDate);
+        Device[] GetDevices(int userID, bool isActive);
         DeviceType[] GetDeviceTypes(bool IsActive);
-        User? GetUser(string username, string password);
-        string hash(string s);
+        int GetUser(string username, string password);
+        string Hash(string s);
         int PostDataPoint(int DeviceID, int Value);
         int PostDevice(int UserID, int DeviceTypeID, string DeviceName);
         int PostDeviceType(string DeviceTypeName, string Description, bool IsActive);

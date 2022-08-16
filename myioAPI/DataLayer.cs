@@ -6,19 +6,21 @@ using System.Security.Cryptography;
 using System.Text;
 using mIODTOs;
 using System.Data.SqlClient;
+using System.Data;
 
 namespace myioAPI
 {
     public class DataLayer : IDataLayer, IDisposable
     {
         private bool disposedValue;
+        IDbConnection dbConnection;
 
-        public DataLayer()
+        public DataLayer(IDbConnection dbConnection)
         {
-            SqlConnection sqlConnection = new SqlConnection();
+            this.dbConnection = dbConnection;
         }
 
-        public string hash(string s)
+        public string Hash(string s)
         {
             using var hash = SHA256.Create();
             var byteArray = hash.ComputeHash(Encoding.UTF8.GetBytes(s));
@@ -27,7 +29,7 @@ namespace myioAPI
 
         public int CreateUser(string username, string password)
         {
-            string databasePass = hash(password);
+            string databasePass = Hash(password);
 
             return 1;
         }
@@ -37,26 +39,94 @@ namespace myioAPI
             return 1;
         }
 
-        public UserData[]? GetData(int UserID, int DeviceID, int MinValue, int MaxValue, DateTime MinDate, DateTime MaxDate)
+        public UserData[] GetData(int UserID, int DeviceID, int MinValue, int MaxValue, DateTime MinDate, DateTime MaxDate)
         {
             return null;
         }
 
-        public Device[]? GetDevices(int UserID, bool IsActive)
+        public Device[] GetDevices(int userID, bool isActive)
         {
-            return null;
+            SqlCommand command = new SqlCommand()
+            {
+                CommandType = CommandType.StoredProcedure,
+                CommandText = "usp_GetDevices",
+                Connection = dbConnection as SqlConnection
+            };
+
+            command.Parameters.Add(new SqlParameter("UserID", userID));
+            command.Parameters.Add(new SqlParameter("IsActive", isActive));
+
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(command);
+            DataTable dataTable = new DataTable();
+            dataAdapter.Fill(dataTable);
+
+            var result = new Device[dataTable.Rows.Count];
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                DataRow row = dataTable.Rows[i];
+                result[i] = new Device()
+                {
+                    DeviceID = (int)row["DeviceID"],
+                    DeviceName = row["DeviceName"].ToString(),
+                    AccessKey = Guid.Parse(row["AccessKey"].ToString()),
+                    DeviceTypeID = (byte)row["DeviceTypeID"],
+                    IsActive = (bool)row["IsActive"]
+                };
+            }
+
+            return result;
         }
 
-        public DeviceType[] GetDeviceTypes(bool IsActive)
+        public DeviceType[] GetDeviceTypes(bool isActive)
         {
-            return null;
+            SqlCommand command = new SqlCommand()
+            {
+                CommandType = CommandType.StoredProcedure,
+                CommandText = "usp_GetDeviceTypes",
+                Connection = dbConnection as SqlConnection
+            };
+
+            command.Parameters.Add(new SqlParameter("IsActive", isActive));
+
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(command);
+            DataTable dataTable = new DataTable();
+            dataAdapter.Fill(dataTable);
+
+            var result = new DeviceType[dataTable.Rows.Count];
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                DataRow row = dataTable.Rows[i];
+                result[i] = new DeviceType()
+                {
+                    DeviceTypeID = (byte)row["DeviceTypeID"],
+                    DeviceTypeName = row["DeviceTypeName"].ToString(),
+                    Description = row["Description"].ToString(),
+                    IsActive = (bool)row["IsActive"]
+                };
+            }
+
+            return result;
         }
 
-        public User? GetUser(string username, string password)
+        public int GetUser(string username, string password)
         {
-            string databasPass = hash(password);
+            string databasPass = Hash(password);
 
-            return null;
+            SqlCommand command = new SqlCommand()
+            {
+                CommandType = CommandType.StoredProcedure,
+                CommandText = "usp_GetUser",
+                Connection = dbConnection as SqlConnection
+            };
+
+            command.Parameters.Add(new SqlParameter("Username", username));
+            command.Parameters.Add(new SqlParameter("Password", databasPass));
+
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(command);
+            DataTable dataTable = new DataTable();
+            dataAdapter.Fill(dataTable);
+
+            return (int)dataTable.Rows[0]["UserID"];
         }
 
         public int PostDataPoint(int DeviceID, int Value)

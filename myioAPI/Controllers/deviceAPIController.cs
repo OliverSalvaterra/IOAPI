@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+
+using mIODTOs;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +13,40 @@ namespace myioAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class deviceAPIController<T> : ControllerBase
+    public class DeviceAPIController : ControllerBase
     {
-        DataLayer dl = new DataLayer();
+        IDataLayer dataLayer;
+        
+        public DeviceAPIController(IDataLayer dataLayer)
+	    {
+            this.dataLayer = dataLayer;
+	    }
 
-        [HttpPost]
-        public int PostNewUser([FromBody] MyAuthInfo myThingy)
+        [HttpGet]
+        [Route("GetDevices")]
+        public ActionResult<Device[]> GetDevices()
         {
-            return dl.CreateUser();
+            var result = dataLayer.GetDevices(userID: 3, isActive: true);
+
+            return result;
         }
 
+        [HttpGet]
+        [Route("GetDeviceTypes")]
+        public ActionResult<DeviceType[]> GetDeviceTypes()
+        {
+            var result = dataLayer.GetDeviceTypes(IsActive: true);
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("GetUser")]
+        public ActionResult<int> GetUser()
+        {
+            var result = dataLayer.GetUser(username: "norman", password: "chonk");
+
+            return result;
+        }
     }
 }

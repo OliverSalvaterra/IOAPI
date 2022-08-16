@@ -11,7 +11,7 @@ namespace myioAPI
 
         public class Table<TKey> : ITable
         {
-            private HashSet<TKey> data;
+            private HashSet<TKey> data = default;
 
             public bool this[TKey key]
             {
@@ -24,7 +24,7 @@ namespace myioAPI
 
         public class Table<TKey, TValue> : ITable
         {
-            private Dictionary<TKey, TValue> data;
+            private Dictionary<TKey, TValue> data = default;
 
             public TValue this[TKey index]
             {
@@ -38,8 +38,8 @@ namespace myioAPI
 
     public sealed partial class YesThisIsReallyADataBase
     {
-        private readonly Dictionary<string, ITable> kvpTables;
-        private readonly Dictionary<string, DataTable> sqlTables;
+        private readonly Dictionary<string, ITable> kvpTables = default;
+        private readonly Dictionary<string, DataTable> sqlTables = default;
         public static YesThisIsReallyADataBase DataBase { get; } = new YesThisIsReallyADataBase();
 
         private YesThisIsReallyADataBase() { }
